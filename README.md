@@ -38,7 +38,7 @@ The following is an example of how to use this role:
     - vars/main.yml
 
   roles:
-    - role: jeffreyjs.log2ram
+    - role: jeffreyjs.vagrant
 
   vars:
     vagrant_update: true
