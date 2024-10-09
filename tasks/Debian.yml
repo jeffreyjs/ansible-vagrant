@@ -1,0 +1,16 @@
+---
+- name: Install virtualbox for Debian OS family
+  ansible.builtin.apt: 
+    name: "{{ vagrant_virtualbox_ver }}"
+  when: vagrant_virtualbox_install
+
+- name: Download vagrant
+  ansible.builtin.get_url:
+    url: "{{ vagrant_url_pkg }}.deb"
+    dest: "{{ vagrant_tmp_deb }}"
+    mode: "0644"
+  when: ansible_os_family == 'Debian'
+
+- name: Install vagrant for Debian OS family
+  ansible.builtin.apt: 
+    deb: "{{ vagrant_tmp_deb }}"

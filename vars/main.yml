@@ -1,0 +1,6 @@
+---
+vagrant_url_pkg: "https://releases.hashicorp.com/vagrant/{{ vagrant_version }}/vagrant_{{ vagrant_version }}-1_{{ vagrant_arch }}"
+
+vagrant_update: false
+
+# vagrant_version: 2.4.1
