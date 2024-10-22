@@ -12,7 +12,6 @@
 - name: Install vagrant
   when: 
     - installed_result.rc != 0
-    - not vagrant_version is defined
   tags: ["packages", "vagrant"]
   block:
     - name: Get latest release
@@ -24,6 +23,7 @@
     - name: Set version if not defined
       ansible.builtin.set_fact:
         vagrant_version: "{{ vagrant_release.json.tag_name | regex_search('[0-9].*') }}"
+      when: vagrant_version is not defined
 
     - name: Check installed version
       ansible.builtin.shell:
@@ -63,15 +63,7 @@
   tags: ["packages", "vagrant"]
 
 - name: Include Debian OS specific tasks
-  ansible.builtin.include_tasks: Debian.yml
+  ansible.builtin.include_tasks: "{{ ansible_os_family }}.yml"  
   when:
-    - ansible_os_family == 'Debian'
-    - installed_result.rc != 0
-  tags: ["packages", "vagrant"]
-
-- name: Include RedHat OS specific tasks
-  ansible.builtin.include_tasks: RedHat.yml
-  when:
-    - ansible_os_family == 'RedHat'
     - installed_result.rc != 0
   tags: ["packages", "vagrant"]
