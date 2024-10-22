@@ -9,9 +9,10 @@
   changed_when: false
   tags: ["packages", "vagrant"]
 
-- name: Install vagrant
+- name: Set latest version
   when: 
     - installed_result.rc != 0
+    - vagrant_version is not defined
   tags: ["packages", "vagrant"]
   block:
     - name: Get latest release
@@ -24,16 +25,6 @@
       ansible.builtin.set_fact:
         vagrant_version: "{{ vagrant_release.json.tag_name | regex_search('[0-9].*') }}"
       when: vagrant_version is not defined
-
-    - name: Check installed version
-      ansible.builtin.shell:
-        cmd: |
-          set -o pipefail
-          vagrant version 2>&1 | grep -q {{ vagrant_version }}
-        executable: /bin/bash
-      failed_when: false
-      changed_when: false
-      register: vagrant_version_match
 
     - name: Get checksums
       when: vagrant_version_match.rc != 0
@@ -52,6 +43,17 @@
           with_items: "{{ vagrant_checksums }}"
           when:
             - "('vagrant-' + vagrant_version + '-1_' + vagrant_arch) in item"
+
+    - name: Check installed version
+      ansible.builtin.shell:
+        cmd: |
+          set -o pipefail
+          vagrant version 2>&1 | grep -q {{ vagrant_version }}
+        executable: /bin/bash
+      failed_when: false
+      changed_when: false
+      register: vagrant_version_match
+      when: installed_result.rc == 0
 
 - name: Create temporary directory
   ansible.builtin.file:
