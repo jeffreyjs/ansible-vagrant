@@ -1,11 +1,14 @@
 ---
 - name: Download vagrant
+  become: true
+  become_method: ansible.builtin.sudo
   ansible.builtin.get_url:
-    url: "{{ vagrant_url_pkg }}.deb"
-    dest: "{{ vagrant_tmp_rpm }}"
+    url: "{{ vagrant_url_pkg }}"
+    dest: "{{ vagrant_tmp_pkg }}"
     mode: "0644"
+    checksum: "{{ vagrant_checksum }}"
   when: ansible_os_family == "RedHat"
 
 - name: Install vagrant for RedHat OS family
   ansible.builtin.dnf:
-    name: "{{ vagrant_tmp_rpm }}"
+    name: "{{ vagrant_tmp_pkg }}"

@@ -10,9 +10,8 @@
   tags: ["packages", "vagrant"]
 
 - name: Set latest version
-  when: 
+  when:
     - installed_result.rc != 0
-    - vagrant_version is not defined
   tags: ["packages", "vagrant"]
   block:
     - name: Get latest release
@@ -45,16 +44,21 @@
           run_once: true
         - name: Get checksum list from github
           ansible.builtin.set_fact:
-            vagrant_checksums: "{{ lookup('url', 'https://releases.hashicorp.com/vagrant/' + vagrant_version + '/vagrant_' + vagrant_version + '_SHA256SUMS', wantlist=True) | list }}"
+            vagrant_checksums:
+              "{{ lookup('url', 'https://releases.hashicorp.com/vagrant/' +
+              vagrant_version + '/vagrant_' + vagrant_version +
+              '_SHA256SUMS', wantlist=True) | list }}"
           run_once: true
         - name: Get checksum for {{ vagrant_arch }}
           ansible.builtin.set_fact:
             vagrant_checksum: "sha256:{{ item.split(' ')[0] }}"
           with_items: "{{ vagrant_checksums }}"
           when:
-            - "('vagrant-' + vagrant_version + '-1_' + vagrant_arch) in item"
+            - "(__vagrant_package) in item"
 
 - name: Create temporary directory
+  become: true
+  become_method: ansible.builtin.sudo
   ansible.builtin.file:
     state: directory
     path: "{{ vagrant_tmp_dir }}"
@@ -64,7 +68,7 @@
   tags: ["packages", "vagrant"]
 
 - name: Include Debian OS specific tasks
-  ansible.builtin.include_tasks: "{{ ansible_os_family }}.yml"  
+  ansible.builtin.include_tasks: "{{ ansible_os_family }}.yml"
   when:
     - installed_result.rc != 0
   tags: ["packages", "vagrant"]
