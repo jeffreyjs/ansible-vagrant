@@ -7,4 +7,3 @@ vagrant_update: false
 
 __vagrant_file: "vagrant_{{ vagrant_version }}-1_{{ vagrant_arch }}"
 __vagrant_package: "{{ __vagrant_file }}.{% if ansible_os_family == 'RedHat' %}rpm{% else %}deb{% endif %}"
-
